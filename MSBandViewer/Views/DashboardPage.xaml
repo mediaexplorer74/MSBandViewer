@@ -1,0 +1,164 @@
+﻿<Page
+    x:Class="Niuware.MSBandViewer.Views.DashboardPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Niuware.MSBandViewer.Views"
+    xmlns:controls="using:Niuware.MSBandViewer.Controls"
+    xmlns:converters="using:Niuware.MSBandViewer.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Loaded="Page_Loaded" 
+    Unloaded="Page_Unloaded"
+    DataContext="{Binding RelativeSource={RelativeSource Self}}"
+    mc:Ignorable="d"
+>
+
+    <Page.Resources>
+        <converters:GsrToStringConverter x:Key="GsrConverter" />
+        <converters:TemperatureToStringConverter x:Key="TemperatureConverter" />
+        <converters:HeartRateToStringConverter x:Key="HeartRateConverter" />
+    </Page.Resources>
+
+    <Page.BottomAppBar>
+        <CommandBar x:Name="commandBar" IsEnabled="False">
+            <AppBarButton x:Name="syncBandButton" Icon="Sync" Label="sync band" Click="syncBandButton_Click" />
+            <AppBarSeparator />
+            <AppBarButton x:Name="startOrStopSessionButtton" Icon="Play" Label="start session" Click="startOrStopSessionButtton_Click" />
+            <AppBarButton x:Name="saveSessionButton" Icon="save" Label="save" Click="saveSessionButton_Click" IsEnabled="False" />
+        </CommandBar>
+    </Page.BottomAppBar>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="48" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Top" Background="{ThemeResource SystemControlBackgroundChromeMediumBrush}" HorizontalAlignment="Stretch">
+            <Button Template="{StaticResource SplitViewContentMenuButtonTemplate}" />
+            <TextBlock x:Name="pageTitle" FontSize="24" Margin="10 0 0 0" VerticalAlignment="Center">Dashboard</TextBlock>
+        </StackPanel>
+        <Grid Grid.Row="1" x:Name="dashboardGrid">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height=".3*" MinHeight="300" />
+                    <RowDefinition Height=".7*" />
+                </Grid.RowDefinitions>
+                <Grid x:Name="healthDataGrid" Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="360" MinWidth="360" />
+                        <ColumnDefinition Width="250" MinWidth="250" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid x:Name="msBandActivityGrid" Grid.Column="0">
+                        <StackPanel Padding="15">
+                            <TextBlock x:Name="msBandNameTextBlock" FontSize="32" Margin="0 0 0 20"></TextBlock>
+                            <Grid>
+                                <Image Source="../Assets/msband.png" Width="320" Height="160" HorizontalAlignment="Left" />
+                                <Image x:Name="msBandMeTileImage" Margin="0,74,7,31" Width="150" MinWidth="150" Height="58" Stretch="UniformToFill" />
+                                <TextBlock x:Name="msBandRecordTextBlock" Margin="88,79,34,0" FontSize="12" Text="● recording" Visibility="Collapsed">
+                                    <TextBlock.Projection>
+                                        <PlaneProjection RotationX="1.271" RotationY="0.065" RotationZ="-2.087"/>
+                                    </TextBlock.Projection>
+                                    <TextBlock.Resources>
+                                        <Storyboard x:Name="msBandRecordTextBlockStoryboard">
+                                            <DoubleAnimation Storyboard.TargetName="msBandRecordTextBlock" Storyboard.TargetProperty="Opacity" From="1.0" To="0.3" AutoReverse="True" Duration="0:0:1.0" RepeatBehavior="Forever" />
+                                        </Storyboard>
+                                    </TextBlock.Resources>
+                                </TextBlock>
+                                <TextBlock x:Name="msBandClockTextBlock" Margin="86,88,34,0" FontSize="36" RenderTransformOrigin="0,0.5">
+                                    <TextBlock.Projection>
+                                        <PlaneProjection RotationX="2.337" RotationY="11.669" RotationZ="-1.492"/>
+                                    </TextBlock.Projection>
+                                </TextBlock>
+                                <TextBlock x:Name="msBandDayStringTextBlock" Margin="158 100 0 0" FontSize="12">
+                                    <TextBlock.Projection>
+                                        <PlaneProjection RotationX="-4.067" RotationY="2.825" RotationZ="0.856"/>
+                                    </TextBlock.Projection>
+                                </TextBlock>
+                                <TextBlock x:Name="msBandDayNumberTextBlock" Margin="158 112 0 0" FontSize="12">
+                                    <TextBlock.Projection>
+                                        <PlaneProjection RotationX="-4.067" RotationY="2.825" RotationZ="0.856"/>
+                                    </TextBlock.Projection>
+                                </TextBlock>
+                            </Grid>
+                        </StackPanel>
+                    </Grid>
+                    <Grid x:Name="heartActivityGrid" Grid.Column="1">
+                        <StackPanel Padding="15">
+                            <TextBlock FontSize="32" Margin="0 0 0 20">Heart activity</TextBlock>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                <Grid x:Name="heartRateGrid">
+                                    <Grid.Resources>
+                                        <Storyboard x:Name="heartRateStoryboard" SpeedRatio="1" AutoReverse="True" RepeatBehavior="Forever" Duration="0:0:0.5">
+                                            <DoubleAnimation Storyboard.TargetName="heartPathScale" Storyboard.TargetProperty="ScaleX" From="1" To="1.1" />
+                                            <DoubleAnimation Storyboard.TargetName="heartPathScale" Storyboard.TargetProperty="ScaleY" From="1" To="1.1" />
+                                        </Storyboard>
+                                    </Grid.Resources>
+                                    <Canvas x:Name="heartRateCanvas" Height="60" Width="60">
+                                        <Path x:Name="heartRatePath" Fill="Transparent" Stroke="White" StrokeThickness="1"
+                                                Data="M 241,200 
+                                                      A 20,20 0 0 0 200,240
+                                                      C 210,250 240,270 240,270
+                                                      C 240,270 260,260 280,240
+                                                      A 20,20 0 0 0 240,200
+                                                      " Stretch="Fill" 
+                                                Width="{Binding ActualWidth, ElementName=heartRateCanvas}" Height="{Binding ActualHeight, ElementName=heartRateCanvas}">
+                                            <Path.RenderTransform>
+                                                <ScaleTransform x:Name="heartPathScale" />
+                                            </Path.RenderTransform>
+                                            <Path.RenderTransformOrigin>0.5 0.5</Path.RenderTransformOrigin>
+                                        </Path>
+                                    </Canvas>
+                                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                               FontSize="28" Margin="0 0 0 8" Foreground="Black" FontWeight="SemiBold" Text="{x:Bind Path=BandData.heartRate,Mode=OneWay}"></TextBlock>
+                                </Grid>
+                                <StackPanel Margin="20 0 0 0">
+                                    <TextBlock xml:space="preserve">Min: <Run Text="{x:Bind Path=MinHeartBpm,Mode=OneWay,Converter={StaticResource HeartRateConverter},ConverterParameter=min}" />   Max: <Run Text="{x:Bind Path=MaxHeartBpm,Mode=OneWay,Converter={StaticResource HeartRateConverter},ConverterParameter=max}" /></TextBlock>
+                                    <TextBlock>RR Interval: <Run Text="{x:Bind Path=BandData.rrInterval,Mode=OneWay}" /></TextBlock>
+                                    <TextBlock>Status: <Run x:Name="heartRateStatusTextBlock">Acquiring</Run></TextBlock>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                    <Grid x:Name="skinActivityGrid" Grid.Column="2">
+                        <StackPanel Padding="15">
+                            <TextBlock FontSize="32" Margin="0 0 0 0">Skin activity</TextBlock>
+                            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Orientation="Horizontal">
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Background="White" CornerRadius="3" Margin="0 0 15 0" Padding="5 0" Height="20">
+                                        <TextBlock FontSize="20" VerticalAlignment="Center" Foreground="Black" Padding="0 0 0 3">GSR</TextBlock>
+                                    </Border>
+                                    <TextBlock FontSize="52" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="0 0 0 18"
+                                               Text="{x:Bind Path=BandData.gsr,Mode=OneWay,Converter={StaticResource GsrConverter}}"></TextBlock>
+                                    <TextBlock FontSize="34" VerticalAlignment="Center" Margin="5 0 0 0">M&#937;</TextBlock>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="20 0 0 0">
+                                    <Border Background="White" CornerRadius="3" Margin="0 0 15 0" Padding="5 0" Height="20">
+                                        <TextBlock FontSize="20" VerticalAlignment="Center" Foreground="Black" Padding="0 0 0 3">TEMP</TextBlock>
+                                    </Border>
+                                    <TextBlock FontSize="52" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="0 0 0 18"
+                                               Text="{x:Bind Path=BandData.temperature,Mode=OneWay,Converter={StaticResource TemperatureConverter}}"></TextBlock>
+                                    <TextBlock FontSize="34" VerticalAlignment="Center" Margin="5 0 0 0">°C</TextBlock>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+                <Grid x:Name="motionDataGrid" Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width=".2*" />
+                        <ColumnDefinition Width=".2*" />
+                    </Grid.ColumnDefinitions>
+                    <controls:LineGraphCanvas x:Name="accelerometerLineGraphCanvas" Grid.Column="0" XScale="10.0" YScale="2.5" />
+                    <controls:LineGraphCanvas x:Name="gyroscopeLineGraphCanvas" Grid.Column="1" XScale="10.0" YScale="0.15" />
+                </Grid>
+            </Grid>
+        </Grid>
+        <Grid Grid.Row="1" x:Name="syncGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Visibility="Collapsed">
+            <StackPanel x:Name="syncStackPanel" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <ProgressRing x:Name="syncProgressRing" IsActive="True" Height="48" Width="48" />
+                <TextBlock x:Name="syncTextBlock" Margin="0 20 0 0"></TextBlock>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>
