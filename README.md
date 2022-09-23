@@ -5,7 +5,8 @@
 
 ## Screenshots
 
-![MSBandViewer](Images/shot1.png)
+![Desktop](Images/shot1.png)
+![Mobile](Images/shot2.png)
 
 
 ## Requirements
